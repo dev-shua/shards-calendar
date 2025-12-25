@@ -1,0 +1,22 @@
+{
+  "name": "shards-calendary",
+  "description": "",
+  "license": "MIT",
+  "author": "Shua",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "pnpm sync-version && vite build",
+    "sync-version": "node scripts/sync-version.mjs",
+    "deploy": "pnpm build && node scripts/deploy.mjs",
+    "zip": "pnpm build && node scripts/zip.mjs",
+    "release:patch": "pnpm version patch && pnpm sync-version && git add package.json public/module.json pnpm-lock.yaml && git commit -m \"chore(release): v$npm_package_version\" && git tag v$npm_package_version",
+    "release:minor": "pnpm version minor && pnpm sync-version && git add package.json public/module.json pnpm-lock.yaml && git commit -m \"chore(release): v$npm_package_version\" && git tag v$npm_package_version",
+    "release:major": "pnpm version major && pnpm sync-version && git add package.json public/module.json pnpm-lock.yaml && git commit -m \"chore(release): v$npm_package_version\" && git tag v$npm_package_version"
+  },
+  "devDependencies": {
+    "vite": "^7.2.4"
+  }
+}

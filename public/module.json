@@ -1,0 +1,39 @@
+{
+  "title": "SHARDS Calendar",
+  "description": "Customizable fantasy calendar",
+  "id": "shards-calendar",
+  "version": "1.0.0",
+  "authors": [
+    {
+      "name": "Shua",
+      "email": "dev.shuapi@gmail.com"
+    }
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "languages/en.json"
+    },
+    {
+      "lang": "fr",
+      "name": "Français",
+      "path": "languages/fr.json"
+    }
+  ],
+  "scripts": [],
+  "esmodules": [
+    "module.js"
+  ],
+  "styles": [
+    "styles/module.css"
+  ],
+  "packs": [],
+  "url": "...",
+  "manifest": "...",
+  "download": "",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13"
+  }
+}

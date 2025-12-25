@@ -1,0 +1,20 @@
+name: Release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/actions-setup@v4
+        with: { version: 10 }
+      - uses: actions/Setup-node@v4
+        with: { node-version: 20, cache: "pnpm" }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm zip
+      - uses: softprops/actions-gh-release@v2
+        with:
+          files: shards-calendar-v*.zip
