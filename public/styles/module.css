@@ -1,0 +1,70 @@
+#shards-calendar-fullsettings .window-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* important: pas de double scroll */
+  padding: 0;
+}
+
+#shards-calendar-fullsettings .calendar-root {
+  flex: 1;
+  min-height: 0; /* CRITIQUE pour que les enfants puissent scroller */
+}
+
+/* calendarButton.css (or your global styles) */
+.shards-calendar-button {
+  position: fixed;
+  z-index: 100000;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+
+  cursor: grab;
+}
+
+.shards-calendar-button:active {
+  cursor: grabbing;
+}
+
+.shards-calendar-button i {
+  font-size: 18px;
+}
+
+.shards-calendar-button.is-snapped-top {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  /* optionnel: plus "collé" */
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+}
+
+.shards-calendar-button.is-snapped-top::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 1px;
+  background: rgba(255,255,255,0.12);
+}
+.shards-calendar-button {
+  /* transitions visuelles OK même pendant drag */
+  transition: border-radius 120ms ease, background 120ms ease, box-shadow 120ms ease;
+}
+
+/* transition du déplacement uniquement quand on ne drag pas */
+.shards-calendar-button:not(.is-dragging) {
+  transition: transform 140ms ease, border-radius 120ms ease, background 120ms ease, box-shadow 120ms ease;
+}
+
+.shards-calendar-button.is-snapped-top {
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+}

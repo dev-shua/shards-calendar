@@ -1,1 +1,18 @@
-{}
+{
+  "SHARDS": {
+    "Calendar": {
+      "Settings": {
+        "ChatLog": {
+          "Name": "Display logs in chat",
+          "Hint": ""
+        }
+      },
+      "Error": {
+        "UnknownId": "Unknown Id"
+      },
+      "Chat": {
+        "Changed": "Chat >> Changed"
+      }
+    }
+  }
+}
