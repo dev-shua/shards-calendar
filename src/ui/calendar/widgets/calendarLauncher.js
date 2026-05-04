@@ -1,11 +1,13 @@
 // calendarLauncher.js
 import { mount, unmount } from "svelte";
-import CalendarLauncherButton from "./CalendarLauncherButton.svelte";
-import CalendarLauncherChip from "./CalendarLauncherChip.svelte";
 
-import { CalendarApp } from "../apps/CalendarApp";
-import { CalendarSettingsApp } from "../apps/CalendarSettingsApp";
+import ViewCalendar from "@ui/calendar/views/ViewCalendar.svelte";
+import CalendarLauncherChip from "./CalendarLauncherChip.svelte";
+import { refreshCalendarUi } from "@ui/calendarUiStore";
+import CalendarSettings from "@ui/calendar/settings/CalendarSettings.svelte";
 import { getSetting, SETTINGS_KEYS } from "@lib/settings";
+import { dialogConfirm } from "@ui/widgets/DialogConfirm";
+import { t } from "@utils/i18n";
 
 // --------------------
 // Settings (à brancher plus tard)
@@ -42,23 +44,67 @@ function canShowLauncher({ enabled, access }) {
 // --------------------
 let _calendarApp = null;
 let _settingsApp = null;
+let _isDirty = false;
 
 function openCalendar() {
-  if (!_calendarApp) _calendarApp = new CalendarApp();
-  _calendarApp.render(true);
+  game.shardsCore?.openWindow({
+    id: "shards-calendar-view",
+    title: t("SHARDSCalendar.Title"),
+    icon: "fa-solid fa-calendar-days",
+    initialW: 1100,
+    initialH: 720,
+    resizable: true,
+    render: (container) => {
+      const instance = mount(ViewCalendar, { target: container });
+      Hooks.on("shards-calendar:changed", refreshCalendarUi);
+      refreshCalendarUi();
+      return () => {
+        Hooks.off("shards-calendar:changed", refreshCalendarUi);
+        unmount(instance);
+      };
+    },
+  });
 }
 
 function openSettings() {
-  // settings seulement GM
   if (!game.user?.isGM) return;
-  if (!_settingsApp) _settingsApp = new CalendarSettingsApp();
-  _settingsApp.render(true);
-}
+  _isDirty = false;
 
+  game.shardsCore?.openWindow({
+    id: "shards-calendar-settings",
+    title: t("SHARDSCalendar.SettingsUI.Open"),
+    icon: "fa-solid fa-gear",
+    initialW: 1100,
+    initialH: 720,
+    resizable: true,
+    render: (container) => {
+      const instance = mount(CalendarSettings, {
+        target: container,
+        props: {
+          setDirty: (v) => (_isDirty = !!v),
+        },
+      });
+      Hooks.on("shards-calendar:changed", refreshCalendarUi);
+      refreshCalendarUi();
+      return () => {
+        Hooks.off("shards-calendar:changed", refreshCalendarUi);
+        unmount(instance);
+      };
+    },
+    onBeforeClose: async () => {
+      if (!_isDirty) return true;
+      const ok = await dialogConfirm.confirm({
+        content: `<p>${t("SHARDSCalendar.Alerts.UnsavedChanges")}</p>`,
+        yes: { label: "Close", icon: "fa-solid fa-check" },
+      });
+      return ok;
+    },
+  });
+}
 // --------------------
 // Drag / Snap engine
 // --------------------
-const POS_KEY = "shards.calendar.launcher.pos";
+const POS_KEY = "SHARDSCalendar.launcher.pos";
 
 let root = null;           // wrapper DOM fixed
 let svelte = null;         // mounted component
@@ -107,12 +153,12 @@ function setSnappedTop(next) {
     root.style.borderTopRightRadius = "0";
     root.style.borderBottomLeftRadius = "12px";
     root.style.borderBottomRightRadius = "12px";
-    root.style.background = "rgba(0,0,0,0.55)";
-    root.style.borderBottomColor = "rgba(255,255,255,0.25)";
+    // root.style.background = "rgba(0,0,0,0.55)";
+    // root.style.borderBottomColor = "rgba(255,255,255,0.25)";
   } else {
     root.style.borderRadius = "12px";
-    root.style.background = "rgba(0,0,0,0.35)";
-    root.style.borderColor = "rgba(255,255,255,0.18)";
+    // root.style.background = "rgba(0,0,0,0.35)";
+    // root.style.borderColor = "rgba(255,255,255,0.18)";
   }
 }
 
@@ -219,9 +265,9 @@ function buildRoot() {
   el.style.display = "inline-flex";
   el.style.alignItems = "center";
   el.style.justifyContent = "center";
-  el.style.border = "1px solid rgba(255,255,255,0.18)";
-  el.style.background = "rgba(0,0,0,0.35)";
-  el.style.backdropFilter = "blur(4px)";
+  // el.style.border = "1px solid rgba(255,255,255,0.18)";
+  // el.style.background = "rgba(0,0,0,0.35)";
+  // el.style.backdropFilter = "blur(4px)";
   el.style.cursor = "grab";
   el.style.borderRadius = "12px";
 
@@ -232,14 +278,12 @@ function buildRoot() {
   return el;
 }
 
-function mountSvelte(mode) {
+function mountSvelte() {
   if (!root) return;
 
   if (svelte) unmount(svelte);
 
-  const Comp = mode === "chip" ? CalendarLauncherChip : CalendarLauncherButton;
-
-  svelte = mount(Comp, {
+  svelte = mount(CalendarLauncherChip, {
     target: root,
     props: {
       openCalendar,
@@ -267,14 +311,14 @@ export function mountCalendarLauncher() {
 
   if (root && root.isConnected) {
     // si on change mode via settings, on remount juste le contenu
-    mountSvelte(cfg.mode);
+    mountSvelte();
     return;
   }
 
   root = buildRoot();
   document.body.appendChild(root);
 
-  mountSvelte(cfg.mode);
+  mountSvelte();
 
   const saved = loadPos();
   if (saved) {

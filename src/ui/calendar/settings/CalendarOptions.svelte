@@ -1,6 +1,7 @@
 <script>
   import Row from "@ui/formElements/Row.svelte";
   import { dialogConfirm } from "@ui/widgets/DialogConfirm";
+  import { t } from "@utils/i18n";
 
   export let draft = null;
   export let touch = () => {};
@@ -32,9 +33,9 @@
     if (!draft?.id) return;
 
     const ok = await dialogConfirm({
-      title: "Confirm?",
-      content: `Delete this calendar? This cannot be undone.`,
-      yes: { label: "Delete it", icon: "fa-solid fa-trash" },
+      title: t("SHARDSCalendar.Alerts.Delete.Title"),
+      content: t("SHARDSCalendar.Alerts.Delete.Content"),
+      yes: { label: t("SHARDSCalendar.Alerts.Delete.YesLabel"), icon: "fa-solid fa-trash" },
     });
 
     if (!ok) return;
@@ -45,14 +46,14 @@
 {#if draft}
   <section class="sc-main sc-options" on:input={touch} on:change={touch}>
     <header class="sc-titlebar">
-      <h2>Options</h2>
-      <p class="sc-subtle">Settings specific to this calendar.</p>
+      <h2>{t("SHARDSCalendar.Options.Title")}</h2>
+      <p class="sc-subtle">{t("SHARDSCalendar.Options.Subtitle")}</p>
     </header>
 
     <div class="sc-left">
       <Row>
         <div class="sc-fieldrow sc-fieldrow--stack">
-          <label for="opt-dateformat" class="sc-fieldrow__label">Date format</label>
+          <label for="opt-dateformat" class="sc-fieldrow__label">{t("SHARDSCalendar.Options.DateFormat")}</label>
 
           <input
             id="opt-dateformat"
@@ -64,11 +65,11 @@
           />
 
           <div class="sc-fieldrow__hint">
-            Tokens:
-            <span class="sc-token">{`{wd}`}</span> weekday
-            <span class="sc-token">{`{d}`}</span> day
-            <span class="sc-token">{`{m}`}</span> month
-            <span class="sc-token">{`{y}`}</span> year
+            {t("SHARDSCalendar.Options.Tokens")}:
+            <span class="sc-token">{`{wd}`}</span> {t("SHARDSCalendar.Options.weekday")}
+            <span class="sc-token">{`{d}`}</span> {t("SHARDSCalendar.Options.day")}
+            <span class="sc-token">{`{m}`}</span> {t("SHARDSCalendar.Options.month")}
+            <span class="sc-token">{`{y}`}</span> {t("SHARDSCalendar.Options.year")}
           </div>
         </div>
       </Row>
@@ -76,7 +77,7 @@
       <Row display={false}>
         <div class="sc-fieldrow sc-fieldrow--stack">
           <label for="opt-firstWeekdayIndex" class="sc-fieldrow__label">
-            First day of the week
+            {t("SHARDSCalendar.Options.WeekStartingDay")}
           </label>
 
           <select
@@ -90,7 +91,7 @@
           </select>
 
           <div class="sc-fieldrow__hint">
-            Determines which weekday starts the week in the calendar view.
+            {t("SHARDSCalendar.Options.WeekStartingDayDescription")}
           </div>
         </div>
       </Row>
@@ -106,8 +107,8 @@
             aria-label="Show moons"
           />
           <span class="sc-checkrow__text">
-            <span class="sc-checkrow__label">Show moons</span>
-            <span class="sc-checkrow__hint">Display lunar phases in the UI.</span>
+            <span class="sc-checkrow__label">{t("SHARDSCalendar.Options.ShowMoons")}</span>
+            <span class="sc-checkrow__hint">{t("SHARDSCalendar.Options.ShowMoonsHint")}</span>
           </span>
         </button>
       </Row>
@@ -123,22 +124,22 @@
             aria-label="Show seasons"
           />
           <span class="sc-checkrow__text">
-            <span class="sc-checkrow__label">Show seasons</span>
-            <span class="sc-checkrow__hint">Display the current season in the UI.</span>
+            <span class="sc-checkrow__label">{t("SHARDSCalendar.Options.ShowSeaons")}</span>
+            <span class="sc-checkrow__hint">{t("SHARDSCalendar.Options.ShowSeasonsHint")}</span>
           </span>
         </button>
       </Row>
 
       <div class="sc-danger">
-        <div class="sc-danger__title">Danger zone</div>
+        <div class="sc-danger__title">{t("SHARDSCalendar.Options.DangerZone")}</div>
         <button type="button" class="sc-danger__btn" on:click={confirmDelete}>
-          Delete calendar
+          {t("SHARDSCalendar.Options.DeleteCalendar")}
         </button>
       </div>
     </div>
   </section>
 {:else}
-  <div class="sc-empty-state">Select a calendar to edit.</div>
+  <div class="sc-empty-state">{t("SHARDSCalendar.EventForm.NoCalendarSelectedAction")}</div>
 {/if}
 
 <style>

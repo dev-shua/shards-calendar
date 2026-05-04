@@ -1,6 +1,5 @@
 import { getSetting } from "@lib/settings";
 import { setSetting, SETTINGS_KEYS } from "@lib/settings";
-import log from "@utils/logger";
 
 const DEFAULT_STORE = { version: 1, activeId: null, calendars: {}, states: {} };
 

@@ -7,6 +7,7 @@
   import RemoveButton from "@ui/formElements/RemoveButton.svelte";
   import DragHandle from "@ui/formElements/DragHandle.svelte";
   import DraggableRow from "@ui/formElements/DraggableRow.svelte";
+  import { t } from "@utils/i18n";
 
   export let draft = null;
   export let touch = () => {};
@@ -22,7 +23,7 @@
       ...draft.moons,
       {
         id: crypto?.randomUUID?.() ?? `moon-${Date.now()}`,
-        name: "New Moon",
+        name: t("SHARDSCalendar.Moons.NewMoon"),
         cycle: 30,
         offset: 0,
         color: "#9aa7ff",
@@ -52,8 +53,8 @@
 {#if draft}
   <section class="sc-main sc-moons" on:input={touch} on:change={touch}>
     <header class="sc-titlebar">
-      <h2>Moons</h2>
-      <p class="sc-subtle">Define moons cycles and display.</p>
+      <h2>{t("SHARDSCalendar.Moons.Title")}</h2>
+      <p class="sc-subtle">{t("SHARDSCalendar.Moons.Subtitle")}</p>
     </header>
 
     <ListCard title="Moons">
@@ -62,7 +63,7 @@
       </div>
 
       {#if (draft.moons?.length ?? 0) === 0}
-        <div class="sc-empty">No moons defined.</div>
+        <div class="sc-empty">{t("SHARDSCalendar.Moons.NoDefined")}</div>
       {:else}
         <div class="sc-list" role="list" aria-label="Moons list">
           {#each draft.moons as moon, i (moon.id ?? i)}
@@ -82,7 +83,7 @@
               <input type="text" placeholder="Name" bind:value={moon.name} />
 
               <div class="sc-num">
-                <label class="sr-only" for={`sc-moon-cycle-${i}`}>Cycle</label>
+                <label class="sr-only" for={`sc-moon-cycle-${i}`}>{t("SHARDSCalendar.Moons.Cycle")}</label>
                 <input
                   id={`sc-moon-cycle-${i}`}
                   type="number"
@@ -91,10 +92,10 @@
                   placeholder="Cycle"
                   bind:value={moon.cycle}
                 />
-                <span class="sc-unit">days</span>
+                <span class="sc-unit">{t("SHARDSCalendar.Moons.CycleUnit")}</span>
               </div>
 
-              <label class="sr-only" for={`sc-moon-offset-${i}`}>Offset</label>
+              <label class="sr-only" for={`sc-moon-offset-${i}`}>{t("SHARDSCalendar.Moons.Offset")}</label>
               <input
                 id={`sc-moon-offset-${i}`}
                 class="sc-offset"
@@ -104,7 +105,7 @@
                 bind:value={moon.offset}
               />
 
-              <label class="sr-only" for={`sc-moon-color-${i}`}>Color</label>
+              <label class="sr-only" for={`sc-moon-color-${i}`}>{t("SHARDSCalendar.Moons.Color")}</label>
               <input id={`sc-moon-color-${i}`} class="sc-color" type="color" bind:value={moon.color} />
 
               <RemoveButton onClick={() => removeMoon(i)} />
@@ -115,7 +116,7 @@
     </ListCard>
   </section>
 {:else}
-  <div class="sc-empty-state">Select a calendar to edit.</div>
+  <div class="sc-empty-state">{t("SHARDSCalendar.EventForm.NoCalendarSelectedAction")}</div>
 {/if}
 
 <style>

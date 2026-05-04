@@ -251,7 +251,7 @@
   .shards-calendar-settings .sc-navigation {
     display: inline-flex;
     gap: 8px;
-    padding: 8px 0;
+    padding: 8px 16px;
   }
 
   .shards-calendar-settings h1 {
@@ -261,12 +261,25 @@
 
   .shards-calendar-settings .tab {
     display: inline-flex;
-    padding: 8px;
-    border: 1px solid white;
+    padding: 6px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85em;
+    opacity: 0.6;
+    transition: opacity 120ms, border-color 120ms;
+    background: none;
+    color: inherit;
+  }
+
+  .shards-calendar-settings .tab:hover {
+    opacity: 1;
   }
 
   .shards-calendar-settings .tab.active {
-    border-color: #c9593f;
+    border-color: var(--sc-primary);
+    opacity: 1;
+    color: inherit;
   }
 
   .sc-selector {
@@ -275,23 +288,31 @@
     gap: 8px;
   }
   .sc-split {
-  display: grid;
-  grid-template-columns: 1fr minmax(280px, 360px);
-  gap: 12px;
-  align-items: start;
-}
-
-@media (max-width: 980px) {
-  .sc-split {
-    grid-template-columns: 1fr;
+    display: grid;
+    grid-template-columns: 1fr minmax(280px, 360px);
+    gap: 12px;
+    align-items: start;
   }
-}
 
-.sc-preview-col {
-  position: sticky;
-  top: 0;
-  align-self: start;
-}
+  @media (max-width: 980px) {
+    .sc-split {
+      grid-template-columns: 1fr;
+    }
+  }
 
+  .sc-preview-col {
+    position: sticky;
+    top: 0;
+    align-self: start;
+  }
+
+  .shards-calendar-settings h1 {
+    margin: 0;
+    line-height: 1;
+    font-size: 2em;
+    text-transform: none;
+    border: none;
+    padding: 0;
+  }
 
 </style>

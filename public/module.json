@@ -29,9 +29,9 @@
     "styles/module.css"
   ],
   "packs": [],
-  "url": "...",
-  "manifest": "...",
-  "download": "",
+  "url": "https://github.com/dev-shua/shards-calendar",
+  "manifest": "https://raw.githubusercontent.com/dev-shua/shards-calendar/main/public/module.json",
+  "download": "https://github.com/dev-shua/shards-calendar/releases/download/v1.0.0/shards-calendar-v1.0.0.zip",
   "compatibility": {
     "minimum": "13",
     "verified": "13"

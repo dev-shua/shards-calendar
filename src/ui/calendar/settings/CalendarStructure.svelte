@@ -207,4 +207,10 @@
     width: 100%;
   }
 
+  .sc-titlebar h2 {
+    margin: 0;
+    text-transform: none;
+    border-bottom: none;
+    padding: 0;
+  }
 </style>

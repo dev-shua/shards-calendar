@@ -2,6 +2,7 @@ import { mount, unmount } from "svelte";
 import CalendarSettings from "@ui/calendar/settings/CalendarSettings.svelte";
 import { refreshCalendarUi } from "@ui/calendarUiStore";
 import { dialogConfirm } from "@ui/widgets/DialogConfirm";
+import { t } from "@utils/i18n";
 
 export class CalendarSettingsApp extends foundry.applications.api.ApplicationV2 {
   static DEFAULT_OPTIONS = {
@@ -47,7 +48,7 @@ export class CalendarSettingsApp extends foundry.applications.api.ApplicationV2 
   async close(options) {
     if (this._isDirty) {
       const ok = await dialogConfirm.confirm({
-        content: `<p>You have unsaved changes. Close anyway?</p>`,
+        content: `<p>${t("SHARDSCalendar.Alerts.UnsavedChanges")}</p>`,
         yes: { label: "Close", icon: "fa-solid fa-check" },
       })
       if (!ok) return this;

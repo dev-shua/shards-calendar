@@ -18,15 +18,24 @@ export class CalendarService {
     const daysPerYear = this.definition.months.reduce((sum, m) => sum + m.length, 0);
     return daysPerYear * this.minutesPerDay;
   }
-
+  
   get daysPerYear() {
     return this.definition.months.reduce((sum, m) => sum + (m.length ?? 0), 0);
   }
 
   absoluteDayFromEpoch(date) {
-    // date: { year, monthIndex, day }
-    const d = { year: date.year ?? 0, monthIndex: date.monthIndex ?? 0, day: date.day ?? 1, hour: 0, minute: 0 };
-    return Math.floor(this.absoluteDayFromEpoch(d) / this.minutesPerDay);
+    const y = Number(date?.year ?? 0);
+    const mi = Number(date?.monthIndex ?? 0);
+    const d = Number(date?.day ?? 1);
+
+    let days = y * this.daysPerYear;
+
+    for (let i = 0; i < mi; i++) {
+      days += Number(this.definition.months[i]?.length ?? 0);
+    }
+
+    days += Math.max(0, d - 1);
+    return days;
   }
 
   normalizeDayDate(d) {
@@ -69,13 +78,27 @@ export class CalendarService {
     const eAbs = this.absoluteDayFromEpoch(end);
     const fixed = eAbs < sAbs ? { start: end, end: start } : { start, end };
 
+    const cleanRecurrence = (r) => {
+      if (!r) return null;
+      const freq = r.freq === "year" ? "year" : "month";
+      const interval = Math.max(1, Math.floor(Number(r.interval ?? 1)));
+
+      return {
+        freq,
+        interval,
+        since: r.since ? this.normalizeDayDate(r.since) : null,
+        until: r.until ? this.normalizeDayDate(r.until) : null,
+      };
+    };
+
     const next = {
       id,
       title: String(evt?.title ?? "Untitled").trim(),
       description: String(evt?.description ?? ""),
       color: String(evt?.color ?? "#c9593f"),
       isPublic: !!evt?.isPublic,
-      ...fixed
+      recurrence: cleanRecurrence(evt?.recurrence),
+      ...fixed,
     };
 
     const idx = this.state.events.findIndex(e => e.id === id);
@@ -103,11 +126,52 @@ export class CalendarService {
     this.ensureEventsArray();
     const includePrivate = !!opts.includePrivate;
 
-    const abs = this.absoluteDayFromEpoch(this.normalizeDayDate(day));
+    const target = this.absoluteDayFromEpoch(this.normalizeDayDate(day));
+
+    const matchesRecurrence = (ev, targetAbs) => {
+      const r = ev?.recurrence;
+      if(!r) return false;
+
+      const freq = r.freq === "year" ? "year" : "month";
+      const interval = Math.max(1, Math.floor(Number(r.interval ?? 1)));
+      const start = this.normalizeDayDate(ev.start);
+      const since = r.since ? this.normalizeDayDate(r.since) : null;
+      
+      if (since) {
+        const sinceAbs = this.absoluteDayFromEpoch(since);
+        if (targetAbs < sinceAbs) return false;
+      }
+
+      if (r.until) {
+        const untilAbs = this.absoluteDayFromEpoch(this.normalizeDayDate(r.until));
+        if(targetAbs > untilAbs) return false;
+      }
+
+      const t = this.normalizeDayDate(day);
+
+      if (freq === "year") {
+        if (t.monthIndex !== start.monthIndex) return false;
+        if (t.day !== start.day) return false;
+
+        const dy = t.year - start.year;
+        const mod = ((dy % interval) + interval) % interval;
+        return mod === 0
+      }
+
+      // if freq === month
+      if (t.day !== start.day) return false;
+      const monthsPerYear = this.definition.months?.length ?? 12;
+      const monthsFromStart = (t.year - start.year) * monthsPerYear + (t.monthIndex - start.monthIndex);
+      
+      const mod = ((monthsFromStart % interval) + interval) % interval;
+      return mod === 0;
+    }
+
     return this.state.events.filter(e => includePrivate || e.isPublic).filter(e => {
       const s = this.absoluteDayFromEpoch(e.start);
       const en = this.absoluteDayFromEpoch(e.end ?? e.start);
-      return s <= abs && abs <= en;
+      if (s <= target && target <= en) return true;
+      return matchesRecurrence(e, target);
     }).sort((a, b) => this.absoluteDayFromEpoch(a.start) - this.absoluteDayFromEpoch(b.start));
   }
 
@@ -169,7 +233,8 @@ export class CalendarService {
   }
 
   setDate(next) {
-    this.state = { current: { ...next } };
+    this.ensureEventsArray();
+    this.state = { ...this.state, current: { ...next } };
     this.emit();
   }
 

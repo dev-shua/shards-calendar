@@ -26,15 +26,5 @@ export const makeDefaultCalendarDef = () => ({
 
 export const makeDefaultCalendarState = () => ({
   current: { year: 0, monthIndex: 0, day: 1, hour: 0, minute: 0 },
-  events: [
-    {
-      id: "evt-...",
-      title: "Council meeting",
-      color: "#c9593f",
-      description: "...",
-      isPublic: true,
-      start: { year: 0, monthIndex: 2, day: 10 },
-      end: { year: 0, monthIndex: 2, day: 12 },
-    }
-  ],
+  events: [],
 })

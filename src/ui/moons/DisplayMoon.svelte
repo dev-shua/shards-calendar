@@ -48,10 +48,9 @@
 
 <style>
   .dm {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 10px;
+    display: inline-flex;
     align-items: center;
+    gap: 10px;
   }
 
   .dm-icon {

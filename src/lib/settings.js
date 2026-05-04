@@ -1,5 +1,6 @@
 import { MODULE_ID } from "@core/constants";
 import { CalendarSettingsApp } from "@ui/calendar/apps/CalendarSettingsApp";
+import { t } from "@utils/i18n";
 
 const SETTING_CACHE = {};
 const DEFAULT_CACHE = false;
@@ -10,13 +11,15 @@ export const SETTINGS_KEYS = {
   HIDE_DATE_TO_PLAYERS: "calendar.hide-date-to-players",
   WELCOME_SHOWN: "chat-welcome-message-shown",
   LAUNCHER_ACCESS: "chip-launcher-access",
+  WEATHER_STORE: "weather.store",
+  WEATHER_ENABLED: "weather.enabled",
 };
 
 export function registerSettings() {
   const settings = {
     [SETTINGS_KEYS.CHATLOG]: {
-      name: "SHARDS.Calendar.Settings.ChatLog.Name",
-      hint: "SHARDS.Calendar.Settings.ChatLog.Hint",
+      name: "SHARDSCalendar.ModuleSettings.ChatLog.Name",
+      hint: "SHARDSCalendar.ModuleSettings.ChatLog.Hint",
       scope: "world",
       config: true,
       type: Boolean,
@@ -45,8 +48,8 @@ export function registerSettings() {
       useCache: true,
     },
     [SETTINGS_KEYS.LAUNCHER_ACCESS]: {
-      name: "Calendar launcher access",
-      hint: "Who can see the calendar launcher",
+      name: "SHARDSCalendar.ModuleSettings.LauncherAccess.Name",
+      hint: "SHARDSCalendar.ModuleSettings.LauncherAccess.Hint",
       scope: "world",
       config: true,
       type: String,
@@ -56,12 +59,28 @@ export function registerSettings() {
         player: "All players"
       },
       default: "player",
-    }
+    },
+    [SETTINGS_KEYS.WEATHER_STORE]: {
+      scope: "world",
+      config: false,
+      type: Object,
+      default: { version: 1, days: {} },
+      useCache: false,
+    },
+    [SETTINGS_KEYS.WEATHER_ENABLED]: {
+      name: "SHARDSCalendar.Weather.Settings.Enabled.Name",
+      hint: "SHARDSCalendar.Weather.Settings.Enabled.Hint",
+      scope: "world",
+      config: true,
+      type: Boolean,
+      default: false,
+      useCache: true,
+    },
   };
 
   game.settings.registerMenu(MODULE_ID, "calendarApp", {
-    name: "Open Calendar",
-    label: "Open Calendar",
+    name: t("SHARDSCalendar.SettingsUI.OpenCalendar"),
+    label: t("SHARDSCalendar.SettingsUI.OpenCalendar"),
     icon: "fas fa-calendar",
     type: CalendarSettingsApp,
     restricted: true,

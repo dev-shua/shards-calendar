@@ -3,7 +3,9 @@ import log from "@utils/logger";
 import { CalendarService } from "./service";
 import { loadCalendarStore, saveCalendarStore } from "./store";
 import { makeDefaultCalendarDef, makeDefaultCalendarState, DEFAULT_CALENDAR_ID } from "./defaultCalendar";
-import { t } from "@utils/i18n";
+import { t, tf } from "@utils/i18n";
+import { clearOverride, generateWeatherForCurrentDay, getOrGenerateWeather as fetchOrGenerateWeather, overrideWeather } from "@core/weather/api";
+import { getWeatherForDay } from "@core/weather/store";
 
 let _api = null;
 const notifyChanged = () => Hooks.callAll("shards-calendar:changed");
@@ -59,7 +61,7 @@ export class CalendarAPI {
 
     const existing = this.store.calendars?.[id];
     if(!existing) {
-      ui.notifications?.warn(t("SHARDS.Calendar.Error.UnknownId"));
+      ui.notifications?.warn(t("SHARDSCalendar.Error.UnknownId"));
       return Promise.resolve();
     }
 
@@ -91,7 +93,7 @@ export class CalendarAPI {
 
   selectActive(id) {
     if (!this.store.calendars[id] || !this.store.states[id]) {
-      ui.notifications?.warn(t("SHARDS.Calendar.Error.UnknownId"));
+      ui.notifications?.warn(t("SHARDSCalendar.Error.UnknownId"));
       return Promise.resolve();
     }
 
@@ -109,7 +111,14 @@ export class CalendarAPI {
   }
 
   stepDays(delta) {
-    this.advanceActive({day: delta});
+    this.advanceActive({ day: delta });
+    generateWeatherForCurrentDay(this)
+      .then(() => {
+        Hooks.callAll("shards-calendar:weather:changed");
+        Hooks.callAll("shards-calendar:weather:ready");
+        Hooks.callAll("shards-calendar:date:changed");
+      })
+      .catch(() => {});
   }
 
   setActiveDate(date) {
@@ -171,7 +180,7 @@ export class CalendarAPI {
     const srcState = this.store.states?.[sourceId];
 
     if (!srcDef || !srcState) {
-      ui.notifications?.warn(t("SHARDS.Calendar.Error.UnknownId"));
+      ui.notifications?.warn(t("SHARDSCalendar.Error.UnknownId"));
       return null;
     }
 
@@ -207,6 +216,92 @@ export class CalendarAPI {
     this.persistAndMaybeReinstantiate();
     
     notifyChanged();
+  }
+
+  /* =============================================================
+   * Events API
+   * ========================================================== */
+
+  canEditEvents() {
+    return !!game.user?.isGM;
+  }
+
+  canViewPrivateEvents() {
+    return !!game.user?.isGM;
+  }
+
+  listEvents() {
+    const svc = this.getService();
+    if(!svc) return [];
+    const includePrivate = this.canViewPrivateEvents();
+    return (svc.getEvents?.() ?? []).filter(e => includePrivate || e.isPublic);
+  }
+
+  getEvent(id) {
+    const svc = this.getService();
+    if(!svc) return null;
+    const e = svc.getEvent?.(id) ?? null;
+    if(!e) return null;
+    if(!this.canViewPrivateEvents() && !e.isPublic) return null;
+    return e;
+  }
+
+  getEventsForDay(day) {
+    const svc = this.getService();
+    if(!svc) return [];
+    return svc.getEventsForDay?.(day, { includePrivate: this.canViewPrivateEvents() }) ?? [];
+  }
+
+  createEvent(data) {
+    if (!this.canEditEvents()) {
+      ui.notifications?.warn(t("SHARDSCalendar.GM.Only.CreateEvents"));
+      return null;
+    }
+    const svc = this.getService();
+    if (!svc?.upsertEvent) return null;
+    return svc.upsertEvent({ ...data, id: undefined });
+  }
+
+  updateEvent(id, patch) {
+    if (!this.canEditEvents()) {
+      ui.notifications?.warn(t("SHARDSCalendar.GM.Only.EditEvents"));
+      return null;
+    }
+    const svc = this.getService();
+    if (!svc?.getEvent || !svc?.upsertEvent) return null;
+
+    const prev = svc.getEvent(id);
+    if (!prev) return null;
+    return svc.upsertEvent({ ...prev, ...patch, id });
+  }
+
+  deleteEvent(id) {
+    if (!this.canEditEvents()) {
+      ui.notifications?.warn(t("SHARDSCalendar.GM.Only.DeleteEvents"));
+      return;
+    }
+    const svc = this.getService();
+    svc?.deleteEvent?.(id);
+  }
+
+  /**
+   * WEATHER
+   */
+
+  getWeather(dayIndex) {
+    return getWeatherForDay(dayIndex);
+  }
+
+  async getOrGenerateWeather(dayIndex) {
+    return fetchOrGenerateWeather(this, dayIndex);
+  }
+
+  async overrideWeather(dayIndex, patch) {
+    await overrideWeather(dayIndex, patch);
+  }
+
+  async clearWeatherOverride(dayIndex) {
+    await clearOverride(dayIndex);
   }
 
   /* --- Internals --- */
@@ -260,7 +355,7 @@ export class CalendarAPI {
     const state = this.activeService.getState().current;
     const label = def ? def.name : "Calendar";
 
-    const text = t("SHARDS.Calendar.Chat.Changed", {
+    const text = tf("SHARDSCalendar.Chat.Changed", {
       label,
       y: state.year,
       m: state.monthIndex + 1,
