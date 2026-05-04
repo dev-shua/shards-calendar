@@ -1,5 +1,5 @@
 {
-  "name": "shards-calendary",
+  "name": "shards-calendar",
   "description": "",
   "license": "MIT",
   "author": "Shua",
@@ -8,7 +8,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite build --watch",
-    "build": "pnpm sync-version && vite build",
+    "build": "vite build",
     "deploy": "pnpm build && node scripts/deploy.mjs",
     "release": "node scripts/release.mjs",
     "release:minor": "node scripts/release.mjs minor",
