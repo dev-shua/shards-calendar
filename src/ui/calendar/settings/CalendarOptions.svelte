@@ -124,7 +124,7 @@
             aria-label="Show seasons"
           />
           <span class="sc-checkrow__text">
-            <span class="sc-checkrow__label">{t("SHARDSCalendar.Options.ShowSeaons")}</span>
+            <span class="sc-checkrow__label">{t("SHARDSCalendar.Options.ShowSeasons")}</span>
             <span class="sc-checkrow__hint">{t("SHARDSCalendar.Options.ShowSeasonsHint")}</span>
           </span>
         </button>

@@ -64,7 +64,7 @@
   "SHARDSCalendar.ModuleSettings.ChatLog.Name": "Afficher les logs dans le chat",
   "SHARDSCalendar.ModuleSettings.ChatLog.Hint": "Pas sûr que ça marche...",
   "SHARDSCalendar.ModuleSettings.LauncherAccess.Name": "Accès au calendrier",
-  "SHARDSCalendar.ModuleSettings.LauncherAccess.Hint": "Qui peut voir le calendrier ?",
+  "SHARDSCalendar.ModuleSettings.LauncherAccess.Hint": "Qui peut voir le calendrier ? (et le chip)",
   "SHARDSCalendar.ModuleSettings.LauncherAccess.Nobody": "Personne",
   "SHARDSCalendar.ModuleSettings.LauncherAccess.GM": "DM uniquement",
   "SHARDSCalendar.ModuleSettings.LauncherAccess.player": "Tous le monde",
